@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashton Care Mileage Tracker</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f3f4f6;
+            color: #1f2937;
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+
+        header {
+            background: #2563eb;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .card h2 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #374151;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            text-align: center;
+        }
+
+        .summary-item {
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .summary-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .summary-item .label {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin-top: 4px;
+        }
+
+        .entries-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .entries-header h2 {
+            margin-bottom: 0;
+        }
+
+        .export-btn {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 0.875rem;
+            background: #059669;
+        }
+
+        .export-btn:hover {
+            background: #047857;
+        }
+
+        .entry {
+            background: #f9fafb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .entry-date {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .entry-day {
+            font-size: 0.875rem;
+            color: #6b7280;
+        }
+
+        .entry-miles {
+            font-weight: 700;
+            color: #2563eb;
+            font-size: 1.1rem;
+        }
+
+        .entry-reason {
+            font-size: 0.875rem;
+            color: #4b5563;
+        }
+
+        .entry-driver {
+            font-size: 0.875rem;
+            color: #2563eb;
+            margin-bottom: 4px;
+        }
+
+        .entry-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+
+        .delete-btn {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 0.75rem;
+            background: #dc2626;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 10px;
+        }
+
+        .install-prompt {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            background: #1f2937;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            z-index: 1000;
+            max-width: 460px;
+            margin: 0 auto;
+        }
+
+        .install-prompt.show {
+            display: block;
+        }
+
+        .install-prompt button {
+            margin-top: 10px;
+            background: white;
+            color: #1f2937;
+        }
+
+        .install-prompt .dismiss {
+            background: transparent;
+            color: #9ca3af;
+            margin-top: 5px;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🚗 Ashton Care Mileage Tracker</h1>
+    </header>
+
+    <div class="container">
+        <!-- Entry Form -->
+        <div class="card">
+            <h2>Add Journey</h2>
+            <form id="mileageForm">
+                <div class="form-group">
+                    <label for="driver">Driver Name</label>
+                    <select id="driver" required>
+                        <option value="">Select driver...</option>
+                        <option value="Christian Marshall">Christian Marshall</option>
+                        <option value="Adam Symonds">Adam Symonds</option>
+                        <option value="Ethan Tidy">Ethan Tidy</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="registration">Vehicle Registration</label>
+                    <select id="registration" required>
+                        <option value="">Select vehicle...</option>
+                        <option value="HN71 WML">HN71 WML</option>
+                        <option value="TBC 1">TBC 1</option>
+                        <option value="TBC 2">TBC 2</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" required>
+                </div>
+                <div class="form-group">
+                    <label for="reason">Reason for Travel</label>
+                    <textarea id="reason" placeholder="e.g. Site visit, Supply run..." required>Work</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="miles">Miles Travelled</label>
+                    <input type="number" id="miles" step="0.1" min="0" placeholder="0.0" required>
+                </div>
+                <button type="submit">Add Entry</button>
+            </form>
+        </div>
+
+        <!-- Summary -->
+        <div class="card">
+            <h2>Summary</h2>
+            <div class="summary">
+                <div class="summary-item">
+                    <div class="value" id="weekMiles">0</div>
+                    <div class="label">This Week</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value" id="monthMiles">0</div>
+                    <div class="label">This Month</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value" id="totalMiles">0</div>
+                    <div class="label">Total Miles</div>
+                </div>
+                <div class="summary-item">
+                    <div class="value" id="totalTrips">0</div>
+                    <div class="label">Total Trips</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entries List -->
+        <div class="card">
+            <div class="entries-header">
+                <h2>Recent Entries</h2>
+                <button class="export-btn" onclick="exportCSV()">Export CSV</button>
+            </div>
+            <div id="entriesList">
+                <div class="empty-state">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
+                    <p>No entries yet.<br>Add your first journey above!</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="installPrompt">
+        <strong>Install Mileage Tracker</strong>
+        <p style="font-size: 0.875rem; margin-top: 5px;">Add to your home screen for quick access</p>
+        <button id="installBtn">Install App</button>
+        <button class="dismiss" onclick="dismissInstall()">Not now</button>
+    </div>
+
+    <script>
+        // Data storage with error handling
+        let entries = [];
+        try {
+            entries = JSON.parse(localStorage.getItem('mileageEntries')) || [];
+        } catch (e) {
+            console.log('Could not load from localStorage:', e);
+            entries = [];
+        }
+
+        // Set default date to today
+        document.getElementById('date').valueAsDate = new Date();
+
+        // Day names
+        const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        // Form submission
+        document.getElementById('mileageForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const dateValue = document.getElementById('date').value;
+            const dateObj = new Date(dateValue + 'T12:00:00'); // Add time to avoid timezone issues
+
+            const entry = {
+                id: Date.now(),
+                driver: document.getElementById('driver').value,
+                registration: document.getElementById('registration').value,
+                date: dateValue,
+                day: dayNames[dateObj.getDay()],
+                reason: document.getElementById('reason').value,
+                miles: parseFloat(document.getElementById('miles').value)
+            };
+
+            entries.unshift(entry);
+            saveEntries();
+            renderEntries();
+            updateSummary();
+
+            // Reset form (keep driver and registration selected for convenience)
+            document.getElementById('reason').value = 'Work';
+            document.getElementById('miles').value = '';
+            document.getElementById('date').valueAsDate = new Date();
+            
+            // Visual feedback
+            const btn = document.querySelector('button[type="submit"]');
+            btn.textContent = '✓ Added!';
+            btn.style.background = '#059669';
+            setTimeout(() => {
+                btn.textContent = 'Add Entry';
+                btn.style.background = '#2563eb';
+            }, 1500);
+        });
+
+        // Save to localStorage
+        function saveEntries() {
+            try {
+                localStorage.setItem('mileageEntries', JSON.stringify(entries));
+            } catch (e) {
+                console.log('Could not save to localStorage:', e);
+            }
+        }
+
+        // Render entries list
+        function renderEntries() {
+            const container = document.getElementById('entriesList');
+
+            if (entries.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                        </svg>
+                        <p>No entries yet.<br>Add your first journey above!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = entries.map(entry => `
+                <div class="entry">
+                    <div class="entry-header">
+                        <div>
+                            <div class="entry-date">${formatDate(entry.date)}</div>
+                            <div class="entry-day">${entry.day}</div>
+                        </div>
+                        <div class="entry-miles">${entry.miles} mi</div>
+                    </div>
+                    <div class="entry-driver"><strong>${escapeHtml(entry.driver || 'N/A')}</strong> · ${escapeHtml(entry.registration || 'N/A')}</div>
+                    <div class="entry-reason">${escapeHtml(entry.reason)}</div>
+                    <div class="entry-actions">
+                        <button class="delete-btn" onclick="deleteEntry(${entry.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Format date nicely
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // Escape HTML to prevent XSS
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Delete entry
+        function deleteEntry(id) {
+            if (confirm('Delete this entry?')) {
+                entries = entries.filter(e => e.id !== id);
+                saveEntries();
+                renderEntries();
+                updateSummary();
+            }
+        }
+
+        // Update summary stats
+        function updateSummary() {
+            const now = new Date();
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+
+            const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+            let weekMiles = 0;
+            let monthMiles = 0;
+            let totalMiles = 0;
+
+            entries.forEach(entry => {
+                const entryDate = new Date(entry.date);
+                totalMiles += entry.miles;
+
+                if (entryDate >= startOfWeek) {
+                    weekMiles += entry.miles;
+                }
+                if (entryDate >= startOfMonth) {
+                    monthMiles += entry.miles;
+                }
+            });
+
+            document.getElementById('weekMiles').textContent = weekMiles.toFixed(1);
+            document.getElementById('monthMiles').textContent = monthMiles.toFixed(1);
+            document.getElementById('totalMiles').textContent = totalMiles.toFixed(1);
+            document.getElementById('totalTrips').textContent = entries.length;
+        }
+
+        // Export to CSV
+        function exportCSV() {
+            if (entries.length === 0) {
+                alert('No entries to export');
+                return;
+            }
+
+            const headers = ['Driver', 'Registration', 'Date', 'Day', 'Reason', 'Miles'];
+            const rows = entries.map(e => [
+                '"' + (e.driver || '').replace(/"/g, '""') + '"',
+                '"' + (e.registration || '').replace(/"/g, '""') + '"',
+                e.date,
+                e.day,
+                '"' + e.reason.replace(/"/g, '""') + '"',
+                e.miles
+            ]);
+
+            const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mileage-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+
+            URL.revokeObjectURL(url);
+        }
+
+        // PWA Install prompt
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installPrompt').classList.add('show');
+        });
+
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                document.getElementById('installPrompt').classList.remove('show');
+            }
+        });
+
+        function dismissInstall() {
+            document.getElementById('installPrompt').classList.remove('show');
+        }
+
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+
+        // Initial render
+        renderEntries();
+        updateSummary();
+    </script>
+</body>
+</html>
