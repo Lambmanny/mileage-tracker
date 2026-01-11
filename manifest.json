@@ -2,7 +2,7 @@
     "name": "Ashton Care Mileage Tracker",
     "short_name": "Ashton Mileage",
     "description": "Track daily work mileage for Ashton Care",
-    "start_url": "/",
+    "start_url": "/mileage-tracker/",
     "display": "standalone",
     "background_color": "#f3f4f6",
     "theme_color": "#2563eb",

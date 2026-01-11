@@ -1,8 +1,8 @@
-const CACHE_NAME = 'mileage-tracker-v1';
+const CACHE_NAME = 'mileage-tracker-v2';
 const urlsToCache = [
-    '/',
-    '/index.html',
-    '/manifest.json'
+    '/mileage-tracker/',
+    '/mileage-tracker/index.html',
+    '/mileage-tracker/manifest.json'
 ];
 
 // Install event
