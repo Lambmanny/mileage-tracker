@@ -370,6 +370,20 @@
         // Set default date to today
         document.getElementById('date').valueAsDate = new Date();
 
+        // Load saved dropdown selections
+        const savedDriver = localStorage.getItem('selectedDriver');
+        const savedReg = localStorage.getItem('selectedRegistration');
+        if (savedDriver) document.getElementById('driver').value = savedDriver;
+        if (savedReg) document.getElementById('registration').value = savedReg;
+
+        // Save dropdown selections when changed
+        document.getElementById('driver').addEventListener('change', function() {
+            localStorage.setItem('selectedDriver', this.value);
+        });
+        document.getElementById('registration').addEventListener('change', function() {
+            localStorage.setItem('selectedRegistration', this.value);
+        });
+
         // Day names
         const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
